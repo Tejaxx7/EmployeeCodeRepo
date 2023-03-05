@@ -3,12 +3,16 @@ package com.example.employeeapp.service;
 import com.example.employeeapp.model.Employee;
 import com.example.employeeapp.model.TaxResponse;
 import com.example.employeeapp.repository.EmployeeRepo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
 @Service
 public class EmployeeService {
+
+    private static final Logger LOGGER = LogManager.getLogger(EmployeeService.class);
     private final EmployeeRepo employeeRepo;
     public EmployeeService(EmployeeRepo employeeRepo){
         this.employeeRepo = employeeRepo;
@@ -25,8 +29,12 @@ public class EmployeeService {
 
     public TaxResponse calculateTaxDetails(Long empid){
         Employee employee = findEmployee(empid);
+        LOGGER.info("fetched employee-----------");
+        LOGGER.info(employee);
         Double salaryPerMonth  = employee.getSalary();
         LocalDate dateOfJoining = employee.getDateOfJoining();
+        LOGGER.info("salary per Month: "+ salaryPerMonth);
+        LOGGER.info("date of joining: " + dateOfJoining);
 
         double yearlySalary;
         Double tax;
@@ -39,7 +47,7 @@ public class EmployeeService {
             cess = (yearlySalary - 2500000) * 0.02;
         }
 
-        return TaxResponse.builder().employeeId(employee.getEmployeeID()).firstName(employee.getFirstName()).lastName(employee.getLastName()).taxAmount(tax).cessAmount(cess).build();
+        return TaxResponse.builder().employeeId(employee.getEmployeeID()).firstName(employee.getFirstName()).lastName(employee.getLastName()).taxAmount(tax).cessAmount(cess).yearlySalary(yearlySalary).build();
     }
     private Double calculateTax(Double yearlySalary){
         double tax;
@@ -55,10 +63,18 @@ public class EmployeeService {
     }
     private Double calculateYearlySalary(Double salaryPerMonth,LocalDate dateOfJoining){
         double lossOfPay;
-        int effectiveMonths = 12 + 4 - dateOfJoining.getMonthValue();
+        int effectivejoinedMonthValue = dateOfJoining.getMonthValue();
 
-        int lossOfPayDays = dateOfJoining.lengthOfMonth() - dateOfJoining.getDayOfMonth() -1;
+        if(effectivejoinedMonthValue < 4 )
+            effectivejoinedMonthValue = 12 + effectivejoinedMonthValue;
+
+        int effectiveMonths = 16 - effectivejoinedMonthValue;
+        LOGGER.info("effective Months: " + effectiveMonths);
+
+        int lossOfPayDays =  dateOfJoining.getDayOfMonth() -1;
         lossOfPay = lossOfPayDays * (salaryPerMonth/30);
+        LOGGER.info("Loss of pay Days: " + lossOfPayDays);
+        LOGGER.info("Loss of pay : " + lossOfPay);
         return (salaryPerMonth * effectiveMonths) - (lossOfPay);
     }
 

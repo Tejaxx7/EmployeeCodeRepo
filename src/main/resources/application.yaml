@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: EmployeeApp
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  datasource:
+    username: sa
+    password:
+    url: jdbc:h2:tcp://localhost/~/demo
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
