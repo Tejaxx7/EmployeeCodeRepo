@@ -1,23 +1,26 @@
 package com.example.employeeapp.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class PhoneNumber {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String phoneNumber;
 
+    @JsonBackReference
     @ManyToOne
     private Employee employee;
 
     public PhoneNumber(String phoneNumber){
+        System.out.println("phoneNumber constructor invoked: " + phoneNumber);
         this.phoneNumber = phoneNumber;
     }
 

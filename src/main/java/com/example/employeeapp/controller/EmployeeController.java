@@ -1,6 +1,8 @@
 package com.example.employeeapp.controller;
 
 import com.example.employeeapp.model.Employee;
+import com.example.employeeapp.model.EmployeeTo;
+import com.example.employeeapp.model.PhoneNumber;
 import com.example.employeeapp.model.TaxResponse;
 import com.example.employeeapp.service.EmployeeService;
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -22,10 +25,10 @@ public class EmployeeController {
     }
 
     @PostMapping("/addEmployee")
-    public ResponseEntity<Object> addEmployee(@RequestBody @Valid Employee employee){
-        LOGGER.info(employee);
-        Employee e = employeeService.saveEmployee(employee);
-       return new ResponseEntity<>(e,HttpStatus.OK);
+    public ResponseEntity<List<PhoneNumber>> addEmployee(@RequestBody @Valid EmployeeTo employeeTo){
+        LOGGER.info(employeeTo);
+        List<PhoneNumber> phoneNumbers = employeeService.saveEmployee(employeeTo);
+        return new ResponseEntity<>(phoneNumbers,HttpStatus.OK);
     }
 
     @GetMapping("/getTax/{empid}")
@@ -34,4 +37,10 @@ public class EmployeeController {
         return new ResponseEntity<>(t,HttpStatus.OK);
 
     }
+    @GetMapping("/getEmployee/{empid}")
+    public ResponseEntity<Object> getEmployee(@PathVariable Long empid){
+        return new ResponseEntity<>(employeeService.findEmployee(empid),HttpStatus.OK);
+
+    }
+
 }

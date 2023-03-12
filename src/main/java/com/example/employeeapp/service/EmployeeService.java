@@ -1,29 +1,39 @@
 package com.example.employeeapp.service;
 
 import com.example.employeeapp.model.Employee;
+import com.example.employeeapp.model.EmployeeTo;
+import com.example.employeeapp.model.PhoneNumber;
 import com.example.employeeapp.model.TaxResponse;
 import com.example.employeeapp.repository.EmployeeRepo;
+import com.example.employeeapp.repository.PhoneNumberRepo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EmployeeService {
 
     private static final Logger LOGGER = LogManager.getLogger(EmployeeService.class);
     private final EmployeeRepo employeeRepo;
-    public EmployeeService(EmployeeRepo employeeRepo){
+    private final PhoneNumberRepo phoneNumberRepo;
+    public EmployeeService(EmployeeRepo employeeRepo,PhoneNumberRepo phoneNumberRepo){
+        this.phoneNumberRepo = phoneNumberRepo;
         this.employeeRepo = employeeRepo;
     }
 
 
-    public Employee saveEmployee(Employee employee){
-        Employee savedEmployee = employeeRepo.save(employee);
-        return savedEmployee;
+    public List<PhoneNumber> saveEmployee(EmployeeTo employeeTo){
+        List<PhoneNumber> phoneNumberList = new ArrayList<>();
+        employeeTo.getPhoneNumbersList().forEach(p -> phoneNumberList.add(new PhoneNumber(p)));
+        phoneNumberList.forEach(phoneNumber -> phoneNumber.setEmployee(employeeTo.getEmployee()));
+        employeeRepo.save(employeeTo.getEmployee());
+        return phoneNumberRepo.saveAll(phoneNumberList);
     }
-    private Employee findEmployee(Long empid){
+    public Employee findEmployee(Long empid){
         return employeeRepo.findById(empid).get();
     }
 
